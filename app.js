@@ -15,6 +15,7 @@ import {
   Image,
   TouchableHighlight,
   Linking,
+  NetInfo,
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
 
@@ -104,12 +105,21 @@ export default class infraLayer extends Component {
     );
   }
 
+  // on item pressed open story url
   _onPressItem = (link) =>{
-    //alert(link);
     Linking.openURL(link).catch(err => console.error('An error occurred', err));
   }
 
   componentDidMount() {
+    // check for internet connection
+    NetInfo.isConnected.fetch().then(isConnected => {
+    console.log('First, is ' + (isConnected ? 'online' : 'offline'));
+    if(!isConnected){
+      this.setState({
+        textRespone: 'No internet, check your connection and try again please.',
+        });
+    }
+    });
     // fetch data from url and parse it
     return fetch('http://www.bbc.com/arabic/worldnews/index.xml')
       .then((response) => response.text())
