@@ -9,25 +9,54 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
+var DOMParser = require('xmldom').DOMParser;
 
 export default class infraLayer extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true,
+      textRespone: "loading data ...",
+      data: []
+    }
+    console.log(this.state.isLoading)
+  }
+
   render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
+    if(this.state.isLoading){
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator />
+          <Text>{this.state.textRespone}</Text>
+        </View>
+      );
+    }
+      return (
+        <View style={styles.container}>
+          <Text>{this.state.textRespone}</Text>
+        </View>
+      );
+  }
+
+  componentDidMount() {
+    return fetch('http://www.bbc.com/arabic/worldnews/index.xml')
+      .then((response) => response.text())
+      .then((response) => {
+        this.setState({
+          isLoading: false,
+          textRespone: response,
+        }, function() {
+          // do something with new state
+          //this.parseResponse(response);
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }
 
@@ -37,16 +66,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
   },
 });
 
