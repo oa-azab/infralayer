@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  ActivityIndicator
+  ActivityIndicator,
+  FlatList
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
 
@@ -37,7 +38,10 @@ export default class infraLayer extends Component {
     }
       return (
         <View style={styles.container}>
-          <Text>{this.state.textRespone}</Text>
+          <FlatList
+            data={this.state.data}
+            renderItem={({item}) => <Text>{item.title}</Text>}
+            />
         </View>
       );
   }
@@ -46,17 +50,38 @@ export default class infraLayer extends Component {
     return fetch('http://www.bbc.com/arabic/worldnews/index.xml')
       .then((response) => response.text())
       .then((response) => {
+        var data = this.parseResponse(response);
         this.setState({
           isLoading: false,
           textRespone: response,
+          data: data
         }, function() {
           // do something with new state
-          //this.parseResponse(response);
+          console.log(this.state.data);
         });
       })
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  // Parse xml respone
+  parseResponse = ( textResponse ) => {
+    console.log('Got feed with length ' + textResponse.length );
+    var doc = new DOMParser().parseFromString(textResponse, 'text/xml');
+    var objs = [];
+    var entries = doc.getElementsByTagName('entry');
+    console.log('number of entries' + entries.length)
+    for (var i=0; i < entries.length; i++) {
+      console.log('title'+entries[i].getElementsByTagName("title")[0].textContent);
+      objs.push({
+      id: i,
+      title: entries[i].getElementsByTagName("title")[0].textContent,
+      description: entries[i].getElementsByTagName("summary")[0].textContent,
+      date: entries[i].getElementsByTagName("published")[0].textContent.substring(0, 10),
+      })
+    }
+    return objs;
   }
 }
 
