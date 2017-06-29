@@ -11,7 +11,8 @@ import {
   Text,
   View,
   ActivityIndicator,
-  FlatList
+  FlatList,
+  Image
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
 
@@ -37,13 +38,32 @@ export default class infraLayer extends Component {
       );
     }
       return (
-        <View style={styles.container}>
           <FlatList
             data={this.state.data}
-            renderItem={({item}) => <Text>{item.title}</Text>}
+            renderItem={this.renderItemCard}
+            keyExtractor={item => item.id}
             />
-        </View>
       );
+  }
+
+  renderItemCard = ({item}) => {
+    return(
+      <View style={styles.card}>
+        <View style={styles.card_left_container}>
+          <Text>{item.date}</Text>
+          <Text style={styles.cover_title}
+                numberOfLines={2}>{item.title}</Text>
+          <Text numberOfLines={3}>{item.description}</Text>
+        </View>
+        <View style={styles.card_right_container}>
+          <Image
+          resizeMode='cover'
+          style={{flex: 1}}
+          source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}
+          />
+        </View>
+      </View>
+    );
   }
 
   componentDidMount() {
@@ -79,6 +99,7 @@ export default class infraLayer extends Component {
       title: entries[i].getElementsByTagName("title")[0].textContent,
       description: entries[i].getElementsByTagName("summary")[0].textContent,
       date: entries[i].getElementsByTagName("published")[0].textContent.substring(0, 10),
+      img: entries[i].getElementsByTagName("summary")[0].textContent,
       })
     }
     return objs;
@@ -92,6 +113,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  card: {
+    flex: 1,
+    flexDirection: 'row',
+    height: 150,
+    padding: 5,
+  },
+  card_left_container: {
+    flex: 3,
+    padding: 10,
+  },
+  card_right_container: {
+    flex: 1,
+  },
+  cover_title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  }
 });
 
 AppRegistry.registerComponent('infraLayer', () => infraLayer);
