@@ -13,7 +13,8 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  Linking
+  TouchableHighlight,
+  Linking,
 } from 'react-native';
 var DOMParser = require('xmldom').DOMParser;
 
@@ -82,23 +83,30 @@ export default class infraLayer extends Component {
   // https://material.io/guidelines/components/cards.html#cards-usage
   renderItemCard = ({item}) => {
     return(
-      <View style={styles.card}>
-        <View style={styles.card_left_container}>
-          <Text style={styles.card_title}
-                numberOfLines={2}>{item.title}</Text>
-          <Text numberOfLines={3}>{item.description}</Text>
-          <Text style={styles.card_date}>{item.date}</Text>
+      <TouchableHighlight onPress={() => this._onPressItem(item.link)}>
+        <View style={styles.card}>
+          <View style={styles.card_left_container}>
+            <Text style={styles.card_title}
+                  numberOfLines={2}>{item.title}</Text>
+            <Text numberOfLines={3}>{item.description}</Text>
+            <Text style={styles.card_date}>{item.date}</Text>
 
+          </View>
+          <View style={styles.card_right_container}>
+            <Image
+            resizeMode='cover'
+            style={{flex: 1}}
+            source={{uri: item.img}}
+            />
+          </View>
         </View>
-        <View style={styles.card_right_container}>
-          <Image
-          resizeMode='cover'
-          style={{flex: 1}}
-          source={{uri: item.img}}
-          />
-        </View>
-      </View>
+      </ TouchableHighlight>
     );
+  }
+
+  _onPressItem = (link) =>{
+    //alert(link);
+    Linking.openURL(link).catch(err => console.error('An error occurred', err));
   }
 
   componentDidMount() {
